@@ -1,5 +1,6 @@
 "use strict"
 
+// * Promises ----------------------------------------------------------------------------------------------------
 const promiseOne = new Promise(function (resolve, reject) {
     const value = false;    
 
@@ -11,16 +12,6 @@ const promiseOne = new Promise(function (resolve, reject) {
 });
 
 const promiseTwo = new Promise(function (resolve, reject) {
-    const value = false;    
-
-    if (value) {
-        resolve(true)
-    } else {
-        reject(false)
-    }
-});
-
-const promiseThee = new Promise(function (resolve, reject) {
     const value = true;    
 
     if (value) {
@@ -30,7 +21,7 @@ const promiseThee = new Promise(function (resolve, reject) {
     }
 });
 
-const promiseFour = new Promise(function (resolve, reject) {
+const promiseThee = new Promise(function (resolve, reject) {
     const value = false;    
 
     if (value) {
@@ -39,17 +30,26 @@ const promiseFour = new Promise(function (resolve, reject) {
         reject(false)
     }
 });
+// ------------------------------------------------------------------------------------------------------------------
 
-const arrPromise = [ promiseOne, promiseTwo, promiseThee, promiseFour ].map(promise => promise.catch(err => err));
+// *Обрабатываем массив промисов так, чтобы его можно было пробросить в Promise.all ---------------------------------
+const arrPromise = [ promiseOne, promiseTwo, promiseThee ].map(promise => promise.catch(err => err));
+// ------------------------------------------------------------------------------------------------------------------
 
-const p = Promise.all(arrPromise).then(arr => {
-    console.log(arr);
-    
-    if (arr.some(value => value === true)) {
-        return true
-    } else if (arr.every(value => value === false)) {
-        return false
-    }
+// *Promise.all вернет resolve, если хотя бы один э-т массива true --------------------------------------------------
+// *Promise.all вернет reject, если все э-ты массива false 
+const result = Promise.all(arrPromise)
+.then(arr => { 
+    return new Promise(function(resolve, reject) {
+        if (arr.some(value => value === true)) {
+            resolve(true)
+        } else if (arr.every(value => value === false)) {
+            reject(false)
+        }
+    }) 
 });
+// ------------------------------------------------------------------------------------------------------------------
 
-Promise.race([p]);
+// *Передаем результат в Promise.rase -------------------------------------------------------------------------------
+Promise.race([ result ]);
+// ------------------------------------------------------------------------------------------------------------------
